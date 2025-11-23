@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>A.P.P Monetization Simulator </title>
+  <style>
+    /* ============= THEME: TECH NOIR (CYAN + PURPLE NEON) ============= */
+    :root {
+      --bg-main: #050509;
+      --bg-elevated: #090913;
+      --bg-card: #0c0c18;
+      --border-soft: #272744;
+      --cyan: #22d3ee;
+      --cyan-deep: #0891b2;
+      --purple: #a855f7;
+      --purple-deep: #6d28d9;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+      --danger-deep: #b91c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%, #000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    /* ===== Neon animated border utility ===== */
+    .neon-frame {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .neon-frame::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      background: conic-gradient(
+        from 180deg,
+        rgba(34,211,238,0.8),
+        rgba(168,85,247,0.9),
+        rgba(34,211,238,0.8)
+      );
+      filter: blur(6px);
+      opacity: 0.7;
+      z-index: -2;
+      animation: spinGlow 12s linear infinite;
+    }
+
+    .neon-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at top left, #1e293b 0, #020617 55%);
+      z-index: -1;
+    }
+
+    @keyframes spinGlow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* ================= HEADER ================= */
+    header {
+      padding: 18px 32px 16px;
+      background: linear-gradient(to right, #020617, #020617dd, #000000f0);
+      border-bottom: 1px solid rgba(15,23,42,0.8);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+      animation: pulseDot 1.6s ease-in-out infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(0.9); opacity: 0.6; }
+      50%      { transform: scale(1.4); opacity: 1; }
+    }
+
+    header h1 span {
+      background: linear-gradient(120deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text;
+      color: transparent;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    header p {
+      margin: 2px 0 0;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .header-right {
+      text-align: right;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ================= MAIN ================= */
+    main {
+      padding: 20px 28px 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .toolbar h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .toolbar small {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ================= BUTTONS ================= */
+    button {
+      border-radius: 999px;
+      border: 1px solid var(--cyan-deep);
+      padding: 7px 14px;
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 14px rgba(34,211,238,0.6);
+      background: radial-gradient(circle at top, #0b1120, #020617);
+    }
+
+    button.primary {
+      background: linear-gradient(120deg, var(--cyan), var(--purple));
+      border-color: transparent;
+      color: #020617;
+      box-shadow: 0 0 16px rgba(34,211,238,0.7);
+    }
+
+    button.primary:hover {
+      box-shadow: 0 0 22px rgba(168,85,247,0.8);
+    }
+
+    button.icon {
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    button.danger {
+      border-color: var(--danger-deep);
+      color: var(--danger);
+      background: radial-gradient(circle at top, #111827, #020617);
+    }
+
+    button.danger:hover {
+      background: #7f1d1d;
+      color: #fee2e2;
+      box-shadow: 0 0 12px rgba(248,113,113,0.7);
+    }
+
+    /* ================= LAYOUT ================= */
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(280px, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .global-summary {
+        position: static;
+      }
+    }
+
+    /* ================= CARDS ================= */
+    .card {
+      border-radius: 14px;
+      border: 1px solid rgba(39,39,68,0.9);
+      background: radial-gradient(circle at top left, #111827 0, #020617 55%);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+      padding: 14px 16px 12px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .card-header h3 {
+      margin: 0;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-header small {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(34,211,238,0.12);
+      border: 1px solid rgba(34,211,238,0.6);
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .badge.retailer {
+      border-color: rgba(34,211,238,0.9);
+    }
+    .badge.cpg {
+      background: rgba(168,85,247,0.1);
+      border-color: rgba(168,85,247,0.85);
+      color: var(--purple);
+    }
+    .badge.hybrid {
+      background: linear-gradient(120deg, rgba(34,211,238,0.1), rgba(168,85,247,0.1));
+      border-image: linear-gradient(120deg, var(--cyan), var(--purple)) 1;
+    }
+
+    .empty-state {
+      font-size: 13px;
+      font-style: italic;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 10px 8px;
+    }
+
+    /* ================= FORMS ================= */
+    .input-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .field {
+      flex: 1 1 120px;
+      min-width: 120px;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 7px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(51,65,85,0.9);
+      background: radial-gradient(circle at top, #020617, #000);
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(34,211,238,0.6);
+      background: radial-gradient(circle at top, #020617, #020617);
+    }
+
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #1f2937, transparent);
+      margin: 8px 0 10px;
+    }
+
+    /* ================= REVENUE BOXES ================= */
+    .rev-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 640px) {
+      .rev-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .rev-box {
+      border-radius: 10px;
+      border: 1px solid rgba(31,41,55,1);
+      background: radial-gradient(circle at top, #020617, #020617f5);
+      padding: 8px 10px;
+      font-size: 11px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rev-box::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg,
+        rgba(34,211,238,0.1),
+        rgba(168,85,247,0.08));
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .rev-box:hover::before {
+      opacity: 1;
+    }
+
+    .rev-box h4 {
+      margin: 0 0 3px;
+      font-size: 11px;
+      color: rgba(148,163,184,0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .rev-box p {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .rev-total {
+      margin-top: 8px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(34,211,238,0.5);
+      background: radial-gradient(circle at top, rgba(34,211,238,0.15), rgba(15,23,42,0.95));
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rev-total strong {
+      font-size: 15px;
+      color: var(--purple);
+    }
+
+    /* ================= GLOBAL SUMMARY ================= */
+    .global-summary {
+      position: sticky;
+      top: 80px;
+    }
+
+    .summary-card {
+      margin-bottom: 12px;
+    }
+
+    .summary-main {
+      padding: 12px 14px;
+    }
+
+    .summary-main .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+    }
+
+    .summary-main .value {
+      font-size: 22px;
+      font-weight: 800;
+      margin-top: 6px;
+      background: linear-gradient(120deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .summary-sub {
+      padding: 9px 11px;
+      font-size: 12px;
+    }
+
+    .summary-sub h4 {
+      margin: 0 0 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(148,163,184,0.9);
+    }
+
+    .summary-sub p {
+      margin: 2px 0;
+      font-size: 12px;
+    }
+
+    .summary-sub span {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .extras-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .extras-toggle input {
+      width: auto;
+      accent-color: var(--cyan);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>
+        <span>A.P.P Monetization Simulator</span>
+        <div class="logo-pulse"></div>
+      </h1>
+      <p> </p>
+    </div>
+    <div class="header-right">
+      <div>GlobeStrat’25 – Map-In-Motion</div>
+      <div>Model Retailer + CPG Subscription + Product Ads in real time.</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <div>
+        <h2>Customer Portfolio</h2>
+        <small>Add each retailer or CPG client to estimate your total opportunity.</small>
+      </div>
+      <button class="primary" id="addCustomerBtn">
+        <span>+ Add Customer</span>
+      </button>
+    </div>
+
+    <div class="layout">
+      <!-- Left: customers -->
+      <div id="customersColumn">
+        <div id="customersContainer"></div>
+        <div id="noCustomersMsg" class="card empty-state">
+          No customers added yet. Click <b>+ Add Customer</b> to start modeling your revenue.
+        </div>
+      </div>
+
+      <!-- Right: global summary -->
+      <aside class="global-summary">
+        <div class="neon-frame summary-card">
+          <div class="card summary-main">
+            <div class="label">Total Monthly Revenue</div>
+            <div id="globalMonthly" class="value">$0</div>
+
+            <div class="label" style="margin-top:10px;">Total Annual Revenue</div>
+            <div id="globalAnnual" class="value">$0</div>
+          </div>
+        </div>
+
+        <div class="neon-frame summary-card">
+          <div class="card summary-sub">
+            <h4>Annual Revenue by Stream</h4>
+            <p>Retailer (Core + Extras): <span id="globalRetailerAnnual">$0</span></p>
+            <p>CPG Subscription: <span id="globalDataAnnual">$0</span></p>
+            <p>CPG Ads: <span id="globalCpgAnnual">$0</span></p>
+          </div>
+        </div>
+
+        <div class="neon-frame summary-card">
+          <div class="card summary-sub">
+            <h4>Pricing Model</h4>
+            <p>Retailer Core: <span>Small $499 · Medium $1,499 · Large $3,999</span></p>
+            <p>Retailer Extras: <span>+$349 / +$999 / +$1,999 per store</span></p>
+            <p>CPG Basic Subscription: <span>$300 / product / month</span></p>
+            <p>CPG Standard Subscription: <span>$500 / product / month</span></p>
+            <p>CPG Advertising: <span>$99 / product / month (optional)</span></p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // ============= PRICING CONSTANTS =============
+    const PRICES = {
+      retailerCore: { small: 499, medium: 1499, large: 3999 },
+      retailerExtras: { small: 349, medium: 999, large: 1999 },
+      cpgSubTier: { basic: 300, standard: 500 },
+      cpgAd: 99,
+    };
+
+    // DOM elements
+    const customersContainer = document.getElementById("customersContainer");
+    const noCustomersMsg = document.getElementById("noCustomersMsg");
+    const addCustomerBtn = document.getElementById("addCustomerBtn");
+
+    const globalMonthlyEl = document.getElementById("globalMonthly");
+    const globalAnnualEl = document.getElementById("globalAnnual");
+    const globalRetailerAnnualEl = document.getElementById("globalRetailerAnnual");
+    const globalCpgAnnualEl = document.getElementById("globalCpgAnnual");
+    const globalDataAnnualEl = document.getElementById("globalDataAnnual");
+
+    let customerIdCounter = 1;
+
+    function formatMoney(value) {
+      return "$" + value.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    }
+
+    // ============= CUSTOMER CARD CREATION =============
+    function createCustomerCard() {
+      noCustomersMsg.style.display = "none";
+
+      const id = customerIdCounter++;
+      const wrapper = document.createElement("div");
+      wrapper.className = "neon-frame";
+      wrapper.dataset.id = String(id);
+
+      wrapper.innerHTML = `
+        <div class="card customer-card">
+          <div class="card-header">
+            <div>
+              <h3>
+                <input type="text" class="cust-name-input" placeholder="Customer name (e.g., Sprouts, PepsiCo)" />
+                <span class="badge badge-type retailer">Retailer</span>
+              </h3>
+              <small>Configure this customer's retailer footprint and/or CPG products.</small>
+            </div>
+            <button class="icon danger remove-btn" title="Remove customer">&times;</button>
+          </div>
+
+          <div class="section">
+            <div class="input-row">
+              <div class="field">
+                <label>Customer Type</label>
+                <select class="cust-type-select">
+                  <option value="retailer">Retailer</option>
+                  <option value="cpg">CPG</option>
+                  <option value="hybrid">Hybrid (Both)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Retailer core + extras -->
+          <div class="section retailer-section">
+            <div class="section-title">Retailer Core Plan – Navigation & Automation</div>
+            <div class="hint"></div>
+            <div class="input-row">
+              <div class="field">
+                <label>Small Stores</label>
+                <input type="number" class="input-small-stores" min="0" value="0">
+              </div>
+              <div class="field">
+                <label>Medium Stores</label>
+                <input type="number" class="input-medium-stores" min="0" value="0">
+              </div>
+              <div class="field">
+                <label>Large Stores</label>
+                <input type="number" class="input-large-stores" min="0" value="0">
+              </div>
+            </div>
+            <div class="extras-toggle">
+              <input type="checkbox" class="input-extras-enabled" />
+              <span>Enable Extras Plan (heatmaps, dwell time, basket uplift, online checkout)</span>
+            </div>
+          </div>
+
+          <!-- CPG subscription & ads -->
+          <div class="section cpg-section">
+            <div class="section-title">CPG Subscription – Product Intelligence</div>
+            <div class="hint"></div>
+            <div class="input-row">
+              <div class="field">
+                <label>Products (Subscription)</label>
+                <input type="number" class="input-sub-products" min="0" value="0">
+              </div>
+              <div class="field">
+                <label>Subscription Tier</label>
+                <select class="input-tier">
+                  <option value="basic">Basic – $300/product</option>
+                  <option value="standard">Standard – $500/product</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="section cpg-section">
+            <div class="section-title">CPG Advertising – Sponsored Products</div>
+            <div class="hint"></div>
+            <div class="input-row">
+              <div class="field">
+                <label>Products (Advertising)</label>
+                <input type="number" class="input-ad-products" min="0" value="0">
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="section">
+            <div class="section-title">Revenue for This Customer</div>
+            <div class="rev-grid">
+              <div class="rev-box">
+                <h4>Retailer (Core + Extras) – Monthly</h4>
+                <p class="cust-retailer-monthly">$0</p>
+              </div>
+              <div class="rev-box">
+                <h4>CPG Ads – Monthly</h4>
+                <p class="cust-cpg-monthly">$0</p>
+              </div>
+              <div class="rev-box">
+                <h4>CPG Subscription – Monthly</h4>
+                <p class="cust-data-monthly">$0</p>
+              </div>
+            </div>
+
+            <div class="rev-grid" style="margin-top:8px;">
+              <div class="rev-box">
+                <h4>Retailer (Core + Extras) – Annual</h4>
+                <p class="cust-retailer-annual">$0</p>
+              </div>
+              <div class="rev-box">
+                <h4>CPG Ads – Annual</h4>
+                <p class="cust-cpg-annual">$0</p>
+              </div>
+              <div class="rev-box">
+                <h4>CPG Subscription – Annual</h4>
+                <p class="cust-data-annual">$0</p>
+              </div>
+            </div>
+
+            <div class="rev-total">
+              <span>Customer Total Annual</span>
+              <strong class="cust-total-annual">$0</strong>
+            </div>
+          </div>
+        </div>
+      `;
+
+      customersContainer.appendChild(wrapper);
+
+      // Attach handlers
+      const innerCard = wrapper.querySelector(".customer-card");
+      attachCustomerHandlers(innerCard);
+      recalcCustomer(innerCard);
+      recalcGlobalTotals();
+    }
+
+    // ============= CARD HANDLERS =============
+    function attachCustomerHandlers(cardInner) {
+      const wrapper = cardInner.parentElement;
+      const typeSelect = cardInner.querySelector(".cust-type-select");
+      const badge = cardInner.querySelector(".badge-type");
+      const removeBtn = cardInner.querySelector(".remove-btn");
+      const retailerSections = cardInner.querySelectorAll(".retailer-section");
+      const cpgSections = cardInner.querySelectorAll(".cpg-section");
+      const inputs = cardInner.querySelectorAll("input, select");
+
+      function updateTypeUI() {
+        const type = typeSelect.value;
+
+        badge.classList.remove("retailer", "cpg", "hybrid");
+        if (type === "retailer") {
+          badge.textContent = "Retailer";
+          badge.classList.add("retailer");
+        } else if (type === "cpg") {
+          badge.textContent = "CPG";
+          badge.classList.add("cpg");
+        } else {
+          badge.textContent = "Hybrid";
+          badge.classList.add("hybrid");
+        }
+
+        retailerSections.forEach(sec => {
+          sec.style.display = (type === "retailer" || type === "hybrid") ? "" : "none";
+        });
+        cpgSections.forEach(sec => {
+          sec.style.display = (type === "cpg" || type === "hybrid") ? "" : "none";
+        });
+
+        recalcCustomer(cardInner);
+        recalcGlobalTotals();
+      }
+
+      typeSelect.addEventListener("change", updateTypeUI);
+
+      inputs.forEach(inp => {
+        if (inp.classList.contains("cust-name-input")) return;
+        inp.addEventListener("input", () => {
+          recalcCustomer(cardInner);
+          recalcGlobalTotals();
+        });
+      });
+
+      removeBtn.addEventListener("click", () => {
+        wrapper.remove();
+        if (customersContainer.children.length === 0) {
+          noCustomersMsg.style.display = "block";
+        }
+        recalcGlobalTotals();
+      });
+
+      // Initial setup
+      updateTypeUI();
+    }
+
+    // ============= PER-CUSTOMER CALC =============
+    function recalcCustomer(cardInner) {
+      const type = cardInner.querySelector(".cust-type-select").value;
+
+      const getNumber = (selector) => {
+        const el = cardInner.querySelector(selector);
+        if (!el) return 0;
+        const n = parseFloat(el.value);
+        return Number.isNaN(n) || n < 0 ? 0 : n;
+      };
+
+      // Retailer core + extras
+      let retailerMonthly = 0;
+      if (type === "retailer" || type === "hybrid") {
+        const small = getNumber(".input-small-stores");
+        const medium = getNumber(".input-medium-stores");
+        const large = getNumber(".input-large-stores");
+        const extrasEnabled = cardInner.querySelector(".input-extras-enabled").checked;
+
+        const coreMonthly =
+          small * PRICES.retailerCore.small +
+          medium * PRICES.retailerCore.medium +
+          large * PRICES.retailerCore.large;
+
+        let extrasMonthly = 0;
+        if (extrasEnabled) {
+          extrasMonthly =
+            small * PRICES.retailerExtras.small +
+            medium * PRICES.retailerExtras.medium +
+            large * PRICES.retailerExtras.large;
+        }
+
+        retailerMonthly = coreMonthly + extrasMonthly;
+      }
+
+      // CPG subscription & ads
+      let cpgAdsMonthly = 0;
+      let cpgSubMonthly = 0;
+      if (type === "cpg" || type === "hybrid") {
+        const subProducts = getNumber(".input-sub-products");
+        const adProducts = getNumber(".input-ad-products");
+        const tier = cardInner.querySelector(".input-tier").value || "basic";
+        const tierPrice = PRICES.cpgSubTier[tier] || 0;
+
+        cpgSubMonthly = subProducts * tierPrice;
+        cpgAdsMonthly = adProducts * PRICES.cpgAd;
+      }
+
+      const retailerAnnual = retailerMonthly * 12;
+      const cpgAdsAnnual = cpgAdsMonthly * 12;
+      const cpgSubAnnual = cpgSubMonthly * 12;
+      const totalAnnual = retailerAnnual + cpgAdsAnnual + cpgSubAnnual;
+
+      // Update UI text
+      cardInner.querySelector(".cust-retailer-monthly").textContent = formatMoney(retailerMonthly);
+      cardInner.querySelector(".cust-cpg-monthly").textContent = formatMoney(cpgAdsMonthly);
+      cardInner.querySelector(".cust-data-monthly").textContent = formatMoney(cpgSubMonthly);
+
+      cardInner.querySelector(".cust-retailer-annual").textContent = formatMoney(retailerAnnual);
+      cardInner.querySelector(".cust-cpg-annual").textContent = formatMoney(cpgAdsAnnual);
+      cardInner.querySelector(".cust-data-annual").textContent = formatMoney(cpgSubAnnual);
+      cardInner.querySelector(".cust-total-annual").textContent = formatMoney(totalAnnual);
+
+      // Store numeric values on wrapper for global totals
+      const wrapper = cardInner.parentElement;
+      wrapper.dataset.retailerAnnual = String(retailerAnnual);
+      wrapper.dataset.cpgAnnual = String(cpgAdsAnnual);
+      wrapper.dataset.dataAnnual = String(cpgSubAnnual);
+      wrapper.dataset.monthlyTotal = String(retailerMonthly + cpgAdsMonthly + cpgSubMonthly);
+    }
+
+    // ============= GLOBAL TOTALS =============
+    function recalcGlobalTotals() {
+      const wrappers = Array.from(document.querySelectorAll(".customer-card"))
+        .map(card => card.parentElement); // neon-frame is wrapper
+
+      if (wrappers.length === 0) {
+        globalMonthlyEl.textContent = "$0";
+        globalAnnualEl.textContent = "$0";
+        globalRetailerAnnualEl.textContent = "$0";
+        globalCpgAnnualEl.textContent = "$0";
+        globalDataAnnualEl.textContent = "$0";
+        return;
+      }
+
+      let totalMonthly = 0;
+      let totalRetailerAnnual = 0;
+      let totalCpgAnnual = 0;
+      let totalDataAnnual = 0;
+
+      wrappers.forEach(wrapper => {
+        const retailerAnnual = parseFloat(wrapper.dataset.retailerAnnual || "0");
+        const cpgAnnual = parseFloat(wrapper.dataset.cpgAnnual || "0");
+        const dataAnnual = parseFloat(wrapper.dataset.dataAnnual || "0");
+        const monthlyTotal = parseFloat(wrapper.dataset.monthlyTotal || "0");
+
+        totalRetailerAnnual += retailerAnnual;
+        totalCpgAnnual += cpgAnnual;
+        totalDataAnnual += dataAnnual;
+        totalMonthly += monthlyTotal;
+      });
+
+      const totalAnnual = totalRetailerAnnual + totalCpgAnnual + totalDataAnnual;
+
+      globalMonthlyEl.textContent = formatMoney(totalMonthly);
+      globalAnnualEl.textContent = formatMoney(totalAnnual);
+      globalRetailerAnnualEl.textContent = formatMoney(totalRetailerAnnual);
+      globalCpgAnnualEl.textContent = formatMoney(totalCpgAnnual);
+      globalDataAnnualEl.textContent = formatMoney(totalDataAnnual);
+    }
+
+    // ============= INIT =============
+    document.addEventListener("DOMContentLoaded", () => {
+      addCustomerBtn.addEventListener("click", createCustomerCard);
+      // Start with one blank customer
+      createCustomerCard();
+    });
+  </script>
+</body>
+</html>
